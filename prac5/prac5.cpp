@@ -46,122 +46,165 @@ void printZero(int num) {
 
 }
 
-class clData {
+class clDate {
 private:
     unsigned short day;
     unsigned short month;
-    unsigned short years;
+    unsigned short year;
 
 public:
-    clData();
-    clData(unsigned short, unsigned short, unsigned short);
+    clDate();
+    clDate(unsigned short, unsigned short, unsigned short);
+    clDate(const clDate&);
+    clDate(const char*);
+    clDate operator= (const clDate&);
+
+    void setDate(unsigned short, unsigned short, unsigned short);
+    void getDate(int);
+    unsigned short getDay() { return day; }
+    unsigned short getMonth() { return month; }
+    unsigned short getYear() { return year; }
 };
-clData::clData() {
+clDate::clDate() {
     day = 1;
     month = 1;
-    years = 1970;
+    year = 1970;
 }
-clData::clData(unsigned short day, unsigned short month, unsigned short years) {
+clDate::clDate(unsigned short day, unsigned short month, unsigned short year) {
     this->day = day;
     this->month = month;
-    this->years = years;
+    this->year = year;
 }
-struct Date
-{
-    unsigned short day;
-    unsigned short month;
-    unsigned short years;
-};
+
+clDate::clDate(const clDate& date) {
+    this->day = date.day;
+    this->month = date.month;
+    this->year = date.year;
+
+}
+void clDate::getDate(int wLine) {
+    int w = 10;
+    int delta = (wLine - w) / 2 - 1;
+    cout.width(delta); cout << " ";
+    if (day > 9) {
+        cout << day;
+    }
+    else {
+        cout << "0" << day;
+    }
+    cout << ".";
+    if (month > 9) {
+        cout << month;
+    }
+    else {
+        cout << "0" << month;
+    }
+    cout << ".";
+    cout << year;
+    cout.width(delta); cout << " ";
+}
+
+
+void clDate::setDate(unsigned short day, unsigned short month, unsigned short year) {
+    this->day = day;
+    this->month = month;
+    this->year = year;
+}
+
+clDate clDate::operator= (const clDate& date) {
+    this->day = date.day;
+    this->month = date.month;
+    this->year = date.year;
+    return *this;
+}
 
 struct Record {
     char nameCroup[10];
     char type;
     int area;
     int productivity;
-    Date date;
+    clDate date;
 };
 
-class List {
+class clRecord {
+    string nameCroup;
+private:
+    int area;
+protected:
+    int productivity;
+    clDate date;
 public:
-    Record data;
+    char type;
 
-    List* next;
+    clRecord();
+    clRecord(string, char,int,int, clDate);
+    clRecord(string, char,int,int, unsigned short, unsigned short, unsigned short);
+    clRecord(const char*);
+    clRecord(Record*);
 
-
-    void addElem(Record);
-    void removeElem(int);
-    void editElem(int, Record);
-    void insertElem(int, Record);
-    void Draw();
-
+    string getNameCroup() { return nameCroup; }
+    char getType() { return type; }
+    int getArea() { return area; }
+    int getProductivity() { return productivity; }
+    clDate getDate() { return date; }
+    clRecord operator= (const clRecord&);
 
 };
-int lengthList = 0;
-List* myList;
-void List::addElem(Record newRec) {
-    List* newList = new List();
-    newList->data = newRec;
-    if (lengthList == 0) {
-        newList->next = NULL;
-    }
-    else {
-        newList->next = myList;
-    }
-    myList = newList;
-    lengthList++;
-}
-void List::removeElem(int index) {
-    if (index >= 0 && index < lengthList && lengthList > 0) {
-        List* current = myList;
-        List* old;
-        if (index == 0) {
-            old = myList;
-            myList = current->next;
-            delete old;
-            lengthList--;
-        }
-        else {
-            int i = 0;
-            while (current) {
-                if (i == index - 1) {
-                    old = current->next->next;
-                    delete current->next;
-                    current->next = old;
-                    lengthList--;
-                    break;
-                }
-                i++;
-                current = current->next;
-            }
-        }
-    }
-    else cout << endl << "Ошибка индекс не в диапазоне";
-}
-void List::editElem(int index, Record editRec) {
-    if (index > 0 && index < lengthList && lengthList > 0) {
-        List* current = new List();
-        for (int i = 0; i < index; i++) {
-            current = myList->next;
-        }
-        current->data = editRec;
 
-    }
-    else cout << endl << "Ошибка индекс не в диапазоне";
+clRecord::clRecord() {
+    nameCroup = "Croup";
+    type = 't';
+    area = 0;
+    productivity = 0;
 }
-void List::insertElem(int index, Record newRec) {
-    if (index > 0 && index < lengthList + 1 && lengthList > 0) {
-        List* current = new List();
-        List* newList = new List();
-        newList->data = newRec;
-        for (int i = 0; i < index - 1; i++) {
-            current = myList->next;
-        }
-        newList->next = current->next;
-        current->next = newList;
-        lengthList++;
-    }
-    else cout << endl << "Ошибка индекс не в диапазоне";
+clRecord::clRecord(string nameCroup, char type, int area, int productivity, clDate date) {
+    this->nameCroup = nameCroup;
+    this->type = type;
+    this->area = area;
+    this->productivity = productivity;
+    this->date = date;
 }
+clRecord::clRecord(string nameCroup, char type, int area, int productivity, short unsigned day, short unsigned month, short unsigned year) {
+    this->nameCroup = nameCroup;
+    this->type = type;
+    this->area = area;
+    this->productivity = productivity;
+    this->date = clDate(day, month, year);
+}
+
+clRecord::clRecord(Record* rec) {
+    this->nameCroup = rec->nameCroup;
+    this->type = rec->type;
+    this->area = rec->area;
+    this->productivity = rec->productivity;
+    this->date = rec->date;
+}
+
+clRecord::clRecord(const char* nameFile) {
+    FILE* file;
+    char split;
+    fopen_s(&file, nameFile, "r");
+    fscanf_s(file, "%s", &this->nameCroup, (this->nameCroup).length());
+    fscanf_s(file, "%c", &split);
+    fscanf_s(file, "%c", &this->type);
+    fscanf_s(file, "%d", &this->area);
+    fscanf_s(file, "%d", &this->productivity);
+    fscanf_s(file, "%d", this->date.getDay());
+    fscanf_s(file, "%d", this->date.getMonth());
+    fscanf_s(file, "%d", this->date.getYear());
+
+    fclose(file);
+}
+    
+clRecord clRecord::operator= (const clRecord& rec) {
+    this->nameCroup = rec.nameCroup;
+    this->type = rec.type;
+    this->area = rec.area;
+    this->productivity = rec.productivity;
+    this->date = rec.date;
+    return *this;
+}
+
 
 int lenNum(int num) {
     int len = 0;
@@ -226,53 +269,25 @@ void drawFoot() {
     cout << "\n";
 }
 
-void List::Draw() {
-    drawHead();
-    List* currents = new List();
-    currents = myList;
 
-    for (int i = 0; i < lengthList; i++) {
-        cout << "|" << currents->data.nameCroup; drawSpace(15 - strlen(currents->data.nameCroup));
-        cout << "|" << currents->data.type << "    |";
-        printZero(currents->data.area);
-        drawSpace(13);
-        cout << "|" << currents->data.productivity;
-        drawSpace(14);
-        cout << "|";
-        printDate(currents->data.date.day, currents->data.date.month, currents->data.date.years, 19);
-        cout << " |\n|";
-        drawLine(78); cout << "|\n";
-        currents = currents->next;
-    }
-    drawFoot();
-}
-void Draw(Record* records, int size = 3) {
+void Draw(clRecord* records, int size = 3) {
     drawHead();
 
     for (int i = 0; i < size; i++) {
-        cout << "|" << records[i].nameCroup; drawSpace(15 - strlen(records[i].nameCroup));
+        cout << "|" << records[i].getNameCroup(); drawSpace(15 - (records[i].getNameCroup().length()));
         cout << "|" << records[i].type << "    |";
-        printZero(records[i].area);
+        printZero(records[i].getArea());
         drawSpace(13);
-        cout << "|" << records[i].productivity;
+        cout << "|" << records[i].getProductivity();
         drawSpace(14);
         cout << "|";
-        printDate(records[i].date.day, records[i].date.month, records[i].date.years, 19);
+        records->getDate().getDate(19);
         cout << " |\n|";
         drawLine(78); cout << "|\n";
     }
     drawFoot();
 }
 
-void freeList() {
-    List* current;
-    for (int i = 0; i < lengthList; i++) {
-        current = myList->next;
-        delete myList;
-        myList = current;
-    }
-    lengthList = 0;
-}
 
 
 
@@ -286,53 +301,22 @@ int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    Record records[3];
-    records[0] = { "Соя", 'Б',13000,45, {03,03,2022} };
-    records[1] = { "Чумиза", 'З',8000,17, {03,04,2022} };
-    records[2] = { "Рис", 'З',25650, 24, {04,03,2022} };
+
+    clDate date1();
+    clDate date2(31,03,2023);
+    clDate date3(date2);
+    clDate* date4 = new clDate;
+    delete[] date4;
+    clDate DC(date2);
+
+    clRecord record1("Соя", 'Б', 13000, 45, 3, 3, 2022);
+    clRecord records[3];
+    records[0] = clRecord("Соя", 'Б',13000,45, 03,03,2022 );
+    records[1] = clRecord( "Чумиза", 'З',8000,17, 03,04,2022 );
+    records[2] = clRecord( "Рис", 'З',25650, 24, 04,03,2022 );
     Draw(records);
 
-    cout << "Данные из текстового файла:\n";
-    FILE* file;
-    fopen_s(&file, "file.txt", "w+");
-    for (int i = 0; i < 3; i++) {
-        fprintf(file, "%s %c %d %d %d %d %d \n", \
-            records[i].nameCroup, records[i].type, \
-            records[i].area, records[i].productivity, \
-            records[i].date.day, records[i].date.month, records[i].date.years);
-    }
-    fclose(file);
 
-    fopen_s(&file, "file.txt", "r");
-    Record newRecordsTXT[3];
-    char split;
-    for (int i = 0; i < 3; i++) {
-        fscanf_s(file, "%s", newRecordsTXT[i].nameCroup, _countof(newRecordsTXT[i].nameCroup));
-        fscanf_s(file, "%c", &split);
-        fscanf_s(file, "%c", &newRecordsTXT[i].type);
-        fscanf_s(file, "%d", &newRecordsTXT[i].area);
-        fscanf_s(file, "%d", &newRecordsTXT[i].productivity);
-        fscanf_s(file, "%hu", &newRecordsTXT[i].date.day);
-        fscanf_s(file, "%hu", &newRecordsTXT[i].date.month);
-        fscanf_s(file, "%hu", &newRecordsTXT[i].date.years);
-    }
-    fclose(file);
-    Draw(newRecordsTXT);
-    cout << "Данные из бинарного файла:\n";
-    FILE* binfile;
-    Record newRecordsBIN[3];
-
-    fopen_s(&binfile, "file.bin", "w+");
-    fwrite(records, sizeof(records), 1, binfile);
-    fclose(binfile);
-
-    fopen_s(&binfile, "file.bin", "rb");
-    fread(newRecordsBIN, sizeof(newRecordsBIN), 1, binfile);
-    fclose(binfile);
-    Draw(newRecordsBIN);
     return 0;
 }
 
-clData::clData()
-{
-}
