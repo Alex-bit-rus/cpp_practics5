@@ -45,6 +45,27 @@ void printZero(int num) {
     }
 
 }
+
+class clData {
+private:
+    unsigned short day;
+    unsigned short month;
+    unsigned short years;
+
+public:
+    clData();
+    clData(unsigned short, unsigned short, unsigned short);
+};
+clData::clData() {
+    day = 1;
+    month = 1;
+    years = 1970;
+}
+clData::clData(unsigned short day, unsigned short month, unsigned short years) {
+    this->day = day;
+    this->month = month;
+    this->years = years;
+}
 struct Date
 {
     unsigned short day;
@@ -310,4 +331,8 @@ int main()
     fclose(binfile);
     Draw(newRecordsBIN);
     return 0;
+}
+
+clData::clData()
+{
 }
