@@ -61,6 +61,9 @@ public:
 
     void setDate(unsigned short, unsigned short, unsigned short);
     void getDate(int);
+    int getDaysInMonth();
+    bool checkData(unsigned short);
+    void plusFive(unsigned short);
     unsigned short getDay() { return day; }
     unsigned short getMonth() { return month; }
     unsigned short getYear() { return year; }
@@ -82,6 +85,38 @@ clDate::clDate(const clDate& date) {
     this->year = date.year;
 
 }
+
+int clDate::getDaysInMonth() {
+    // Проверяем февраль (високосный год)
+    if (month == 2) {
+        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
+            return 29;
+        }
+        else {
+            return 28;
+        }
+    }
+    // Проверяем месяцы с 30 днями
+    if (month == 4 || month == 6 || month == 9 || month == 11) {
+        return 30;
+    }
+    // Проверяем месяцы с 31 днем
+    return 31;
+}
+
+bool clDate::checkData(unsigned short plusNum) {
+    unsigned short _day = day + plusNum;
+    return _day <= getDaysInMonth();
+}
+
+void clDate::plusFive(unsigned short plusNum = 5) {
+    if (checkData(plusNum)) {
+        day += plusNum;
+    }
+    else cout << "выход за пределы даты!\n";
+}
+
+
 void clDate::getDate(int wLine) {
     int w = 10;
     int delta = (wLine - w) / 2 - 1;
@@ -280,6 +315,7 @@ void Draw(clRecord* records, int size = 3) {
         drawSpace(13);
         cout << "|" << records[i].getProductivity();
         drawSpace(14);
+
         cout << "|";
         records->getDate().getDate(19);
         cout << " |\n|";
@@ -303,10 +339,11 @@ int main()
     SetConsoleOutputCP(1251);
 
     clDate date1();
-    clDate date2(31,03,2023);
+    clDate date2(27,03,2023);
+    date2.plusFive();
     clDate date3(date2);
     clDate* date4 = new clDate;
-    delete[] date4;
+    delete date4;
     clDate DC(date2);
 
     clRecord record1("Соя", 'Б', 13000, 45, 3, 3, 2022);
